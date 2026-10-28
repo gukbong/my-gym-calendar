@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111827">
+<title>나만의 헬스 기록</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;background:#111827;color:#f9fafb;
+  font-family:Arial,sans-serif;padding:14px;
+}
+main{max-width:600px;margin:auto}
+h1{font-size:25px;margin:12px 0}
+h2{font-size:18px;margin:0 0 14px}
+p{line-height:1.6}
+.card{
+  background:#1f2937;border-radius:14px;
+  padding:16px;margin-bottom:15px;
+}
+label{
+  display:block;font-size:13px;color:#d1d5db;
+  margin:12px 0 6px;
+}
+input,textarea,button{
+  font:inherit;border-radius:8px;padding:12px;
+}
+input,textarea{
+  width:100%;background:#111827;
+  border:1px solid #4b5563;color:white;
+}
+button{
+  border:0;background:#d9f99d;color:#17200b;
+  font-weight:bold;cursor:pointer;
+}
+button:active{opacity:.7}
+.primary{width:100%;margin-top:14px}
+.secondary{background:#374151;color:white}
+.danger{background:#7f1d1d;color:white}
+.small{padding:8px;font-size:13px}
+.row{display:flex;gap:8px}
+.row>div{flex:1;min-width:0}
+.muted{color:#9ca3af;font-size:13px}
+.calendar-head{
+  display:flex;justify-content:space-between;
+  align-items:center;gap:8px;margin-bottom:12px;
+}
+.calendar-head strong{font-size:16px}
+.week,.days{
+  display:grid;grid-template-columns:repeat(7,minmax(0,1fr));
+  gap:4px;text-align:center;
+}
+.week div{padding:7px 0;color:#9ca3af;font-size:12px}
+.day{
+  padding:10px 0;min-width:0;
+  background:#374151;color:white;
+  position:relative;font-size:13px;
+}
+.day.selected{outline:2px solid #d9f99d}
+.day.today{color:#d9f99d}
+.day.has-record:after{
+  content:"";position:absolute;bottom:3px;left:calc(50% - 3px);
+  width:6px;height:6px;border-radius:50%;background:#d9f99d;
+}
+.entry{
+  background:#374151;border-radius:10px;
+  padding:12px;margin-top:9px;
+}
+.entry p{margin:7px 0;font-size:14px}
+.entry-actions{display:flex;gap:8px;margin-top:10px}
+.entry-actions button{flex:1}
+.stat{
+  display:flex;justify-content:space-between;
+  padding:9px 0;border-bottom:1px solid #374151;
+}
+footer{
+  color:#9ca3af;font-size:12px;
+  line-height:1.7;padding:5px;
+}
+</style>
+</head>
+
+<body>
+<main>
+
+<h1>💪 나만의 헬스 기록</h1>
+<p class="muted">운동을 기록하고 나의 성장을 확인하세요.</p>
+
+<div class="card">
+<h2>🏋️ 운동 기록 입력</h2>
+
+<label for="date">운동 날짜</label>
+<input id="date" type="date">
+
+<label for="exercise">운동 종목</label>
+<input id="exercise" list="exerciseList"
+ placeholder="예: 벤치프레스">
+<datalist id="exerciseList">
+<option value="벤치프레스">
+<option value="인클라인 벤치프레스">
+<option value="덤벨 프레스">
+<option value="스쿼트">
+<option value="레그프레스">
+<option value="레그컬">
+<option value="레그익스텐션">
+<option value="데드리프트">
+<option value="랫풀다운">
+<option value="시티드 로우">
+<option value="바벨 로우">
+<option value="숄더프레스">
+<option value="사이드 레터럴 레이즈">
+<option value="덤벨 컬">
+<option value="바벨 컬">
+<option value="트라이셉스 푸시다운">
+<option value="카프 레이즈">
+</datalist>
+
+<div class="row">
+<div>
+<label for="weight">중량(kg)</label>
+<input id="weight" type="number" min="0" step="0.25" placeholder="60">
+</div>
+<div>
+<label for="sets">세트 수</label>
+<input id="sets" type="number" min="1" step="1" value="4">
+</div>
+<div>
+<label for="reps">1세트당 횟수</label>
+<input id="reps" type="number" min="1" step="1" value="10">
+</div>
+</div>
+
+<p class="muted">
+같은 무게와 횟수로 진행한 세트를 입력하세요.
+</p>
+
+<label for="note">운동 메모</label>
+<textarea id="note" rows="2" placeholder="예: 마지막 세트가 힘들었음"></textarea>
+
+<button id="saveBtn" class="primary">＋ 운동 기록 저장</button>
+</div>
+
+<div class="card">
+<h2>🗓️ 운동 달력</h2>
+<div class="calendar-head">
+<button id="prev" class="secondary small">◀ 이전</button>
+<strong id="monthTitle"></strong>
+<button id="next" class="secondary small">다음 ▶</button>
+</div>
+<div class="week">
+<div>일</div><div>월</div><div>화</div>
+<div>수</div><div>목</div><div>금</div><div>토</div>
+</div>
+<div id="calendar" class="days"></div>
+<p class="muted">날짜 아래 점은 운동 기록이 있다는 표시입니다.</p>
+</div>
+
+<div class="card">
+<h2 id="recordTitle">📋 운동 기록</h2>
+<div id="records"></div>
+</div>
+
+<div class="card">
+<h2>📊 운동 통계</h2>
+<div class="stat">
+<span>최근 1년간 운동 기록</span>
+<strong id="totalRecords">0</strong>
+</div>
+<div class="stat">
+<span>운동한 날짜</span>
+<strong id="totalDays">0</strong>
+</div>
+<div class="stat">
+<span>기록된 운동 총중량*</span>
+<strong id="totalVolume">0kg</strong>
+</div>
+<p class="muted">
+* 중량 × 세트 × 횟수를 합산한 값입니다.
+</p>
+</div>
+
+<div class="card">
+<h2>🤖 GPT 운동 분석</h2>
+<p class="muted">
+분석 기간을 선택하고 기록을 복사하세요.
+복사한 내용을 ChatGPT 채팅창에 붙여넣으면 됩니다.
+</p>
+
+<label for="fromDate">시작 날짜</label>
+<input id="fromDate" type="date">
+
+<label for="toDate">종료 날짜</label>
+<input id="toDate" type="date">
+
+<button id="copyBtn" class="primary">📋 GPT 분석용 기록 복사</button>
+</div>
+
+<div class="card">
+<h2>💾 기록 백업 및 복원</h2>
+<p class="muted">
+휴대폰을 바꾸거나 브라우저 데이터가 사라질 경우를
+대비해 정기적으로 백업하세요.
+</p>
+<button id="backupBtn" class="primary">기록 백업 파일 만들기</button>
+
+<label for="restoreFile">백업 파일 불러오기</label>
+<input id="restoreFile" type="file" accept=".json,application/json">
+
+<p class="muted">
+복원하면 기존 기록과 백업 기록을 합칩니다.
+같은 기록은 중복 저장하지 않습니다.
+</p>
+</div>
+
+<footer>
+기록은 이 브라우저의 저장 공간에 보관됩니다.<br>
+최근 1년보다 오래된 기록은 앱을 열거나 기록을 저장할 때 자동 삭제됩니다.<br>
+삭제된 기록은 앱에서 복구할 수 없으므로 필요한 기록은 미리 백업하세요.<br>
+앱을 여는 브라우저나 웹사이트 주소가 바뀌면 기록이 보이지 않을 수 있습니다.
+</footer>
+
+</main>
+
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+const KEY = "myGymRecordsV2";
+
+function isoDate(d){
+  return d.getFullYear() + "-" +
+    String(d.getMonth()+1).padStart(2,"0") + "-" +
+    String(d.getDate()).padStart(2,"0");
+}
+
+function today(){
+  return isoDate(new Date());
+}
+
+function cutoffDate(){
+  const d = new Date();
+  d.setHours(12,0,0,0);
+  d.setFullYear(d.getFullYear()-1);
+  return isoDate(d);
+}
+
+function makeId(){
+  if(window.crypto && crypto.randomUUID){
+    return crypto.randomUUID();
+  }
+  return Date.now().toString(36) +
+    Math.random().toString(36).slice(2);
+}
+
+function cleanRecord(r){
+  if(!r || typeof r !== "object") return null;
+
+  const date = String(r.date || "");
+  const exercise = String(r.exercise || "").trim();
+  const weight = Number(r.weight);
+  const sets = Number(r.sets);
+  const reps = Number(r.reps);
+
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+  if(!exercise || exercise.length > 100) return null;
+  if(!Number.isFinite(weight) || weight < 0) return null;
+  if(!Number.isInteger(sets) || sets < 1 || sets > 100) return null;
+  if(!Number.isInteger(reps) || reps < 1 || reps > 1000) return null;
+
+  return {
+    id: String(r.id || makeId()),
+    date,
+    exercise,
+    weight,
+    sets,
+    reps,
+    note: String(r.note || "").slice(0,1000)
+  };
+}
+
+function prune(list){
+  const cutoff = cutoffDate();
+  return list.filter(r => r.date >= cutoff);
+}
+
+function loadRecords(){
+  try{
+    const raw = JSON.parse(localStorage.getItem(KEY) || "[]");
+    if(!Array.isArray(raw)) return [];
+    return prune(raw.map(cleanRecord).filter(Boolean));
+  }catch(e){
+    alert("기록을 읽지 못했습니다. 브라우저 데이터를 삭제하지 말고 백업 파일이 있는지 확인하세요.");
+    return [];
+  }
+}
+
+let records = loadRecords();
+let selectedDate = today();
+let month = new Date();
+month.setDate(1);
+
+$("date").value = today();
+$("fromDate").value = cutoffDate();
+$("toDate").value = today();
+
+function saveRecords(){
+  records = prune(records);
+  try{
+    localStorage.setItem(KEY,JSON.stringify(records));
+    return true;
+  }catch(e){
+    alert("기록을 저장하지 못했습니다. 저장 공간을 확인하고 백업을 진행하세요.");
+    return false;
+  }
+}
+
+function el(tag,cls,text){
+  const node = document.createElement(tag);
+  if(cls) node.className = cls;
+  if(text !== undefined) node.textContent = text;
+  return node;
+}
+
+function renderCalendar(){
+  const year = month.getFullYear();
+  const m = month.getMonth();
+
+  $("monthTitle").textContent = year+"년 "+(m+1)+"월";
+
+  const box = $("calendar");
+  box.replaceChildren();
+
+  const firstDay = new Date(year,m,1).getDay();
+  const daysInMonth = new Date(year,m+1,0).getDate();
+  const todayString = today();
+
+  for(let i=0;i<firstDay;i++){
+    box.appendChild(el("div","",""));
+  }
+
+  for(let day=1;day<=daysInMonth;day++){
+    const date = year+"-"+String(m+1).padStart(2,"0")+"-"+
+      String(day).padStart(2,"0");
+
+    const hasRecord = records.some(r=>r.date===date);
+    let cls = "day";
+
+    if(date===selectedDate) cls+=" selected";
+    if(date===todayString) cls+=" today";
+    if(hasRecord) cls+=" has-record";
+
+    const b = el("button",cls,String(day));
+    b.type = "button";
+
+    b.addEventListener("click",()=>{
+      selectedDate = date;
+      $("date").value = date;
+      renderCalendar();
+      renderRecords();
+    });
+
+    box.appendChild(b);
+  }
+}
+
+function renderRecords(){
+  $("recordTitle").textContent = "📋 "+selectedDate+" 운동 기록";
+
+  const box = $("records");
+  box.replaceChildren();
+
+  const list = records
+    .filter(r=>r.date===selectedDate)
+    .sort((a,b)=>a.id.localeCompare(b.id));
+
+  if(!list.length){
+    box.appendChild(el("p","muted","이 날짜에는 저장된 운동 기록이 없습니다."));
+    return;
+  }
+
+  list.forEach(r=>{
+    const item = el("div","entry");
+
+    item.appendChild(el("strong","",r.exercise));
+
+    item.appendChild(el(
+      "p","",
+      "중량 "+r.weight+"kg · "+r.sets+"세트 × "+r.reps+"회"
+    ));
+
+    item.appendChild(el(
+      "p","muted",
+      "운동량 "+(r.weight*r.sets*r.reps).toLocaleString("ko-KR")+"kg"
+    ));
+
+    if(r.note){
+      item.appendChild(el("p","",r.note));
+    }
+
+    const actions = el("div","entry-actions");
+    const del = el("button","danger small","기록 삭제");
+
+    del.addEventListener("click",()=>{
+      if(!confirm("이 운동 기록을 삭제할까요?")) return;
+      records = records.filter(x=>x.id!==r.id);
+      if(saveRecords()) renderAll();
+    });
+
+    actions.appendChild(del);
+    item.appendChild(actions);
+    box.appendChild(item);
+  });
+}
+
+function renderStats(){
+  $("totalRecords").textContent = records.length+"개";
+  $("totalDays").textContent =
+    new Set(records.map(r=>r.date)).size+"일";
+
+  const volume = records.reduce(
+    (sum,r)=>sum+r.weight*r.sets*r.reps,0
+  );
+
+  $("totalVolume").textContent =
+    Math.round(volume).toLocaleString("ko-KR")+"kg";
+}
+
+function renderAll(){
+  renderCalendar();
+  renderRecords();
+  renderStats();
+}
+
+$("saveBtn").addEventListener("click",()=>{
+  const date = $("date").value;
+  const exercise = $("exercise").value.trim();
+  const weightText = $("weight").value;
+  const weight = Number(weightText);
+  const sets = Number($("sets").value);
+  const reps = Number($("reps").value);
+  const note = $("note").value.trim();
+
+  if(!date || !exercise){
+    alert("운동 날짜와 운동 종목을 입력하세요.");
+    return;
+  }
+
+  if(date < cutoffDate()){
+    alert("최근 1년 이내의 운동 기록만 저장할 수 있습니다.");
+    return;
+  }
+
+  if(weightText.trim()==="" || !Number.isFinite(weight) || weight<0){
+    alert("중량을 올바르게 입력하세요. 맨몸 운동은 0kg으로 입력할 수 있습니다.");
+    return;
+  }
+
+  if(!Number.isInteger(sets) || sets<1 || sets>100 ||
+     !Number.isInteger(reps) || reps<1 || reps>1000){
+    alert("세트 수와 횟수를 올바르게 입력하세요.");
+    return;
+  }
+
+  const record = {
+    id:makeId(),
+    date,
+    exercise,
+    weight,
+    sets,
+    reps,
+    note
+  };
+
+  records.push(record);
+
+  if(!saveRecords()) return;
+
+  selectedDate = date;
+  month = new Date(date+"T12:00:00");
+  month.setDate(1);
+
+  $("exercise").value = "";
+  $("weight").value = "";
+  $("sets").value = "4";
+  $("reps").value = "10";
+  $("note").value = "";
+
+  renderAll();
+  alert("운동 기록을 저장했습니다!");
+});
+
+$("prev").addEventListener("click",()=>{
+  month.setMonth(month.getMonth()-1);
+  renderCalendar();
+});
+
+$("next").addEventListener("click",()=>{
+  month.setMonth(month.getMonth()+1);
+  renderCalendar();
+});
+
+async function copyText(text){
+  if(navigator.clipboard && window.isSecureContext){
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const area = document.createElement("textarea");
+  area.value = text;
+  area.style.position = "fixed";
+  area.style.left = "-9999px";
+  document.body.appendChild(area);
+  area.select();
+
+  const ok = document.execCommand("copy");
+  area.remove();
+
+  if(!ok) throw new Error("copy failed");
+}
+
+$("copyBtn").addEventListener("click",async()=>{
+  const from = $("fromDate").value;
+  const to = $("toDate").value;
+
+  if(!from || !to || from>to){
+    alert("분석 시작 날짜와 종료 날짜를 확인하세요.");
+    return;
+  }
+
+  const list = records
+    .filter(r=>r.date>=from && r.date<=to)
+    .sort((a,b)=>a.date.localeCompare(b.date));
+
+  if(!list.length){
+    alert("선택한 기간에 운동 기록이 없습니다.");
+    return;
+  }
+
+  let text =
+    "[나의 헬스 운동 기록 분석 요청]\\n"+
+    "분석 기간: "+from+" ~ "+to+"\\n\\n";
+
+  list.forEach(r=>{
+    text += "날짜: "+r.date+"\\n";
+    text += "운동: "+r.exercise+"\\n";
+    text += "중량: "+r.weight+"kg\\n";
+    text += "세트: "+r.sets+"세트 × "+r.reps+"회\\n";
+
+    if(r.note) text += "메모: "+r.note+"\\n";
+
+    text += "\\n";
+  });
+
+  text +=
+    "위 기록을 분석해 주세요.\\n"+
+    "1. 운동별 중량 및 운동량 변화\\n"+
+    "2. 운동 빈도와 꾸준함\\n"+
+    "3. 기록에서 확인되는 강점과 개선점\\n"+
+    "4. 다음 운동에 대한 현실적인 제안\\n"+
+    "기록에 없는 정보는 추측하지 말고 알려 주세요.";
+
+  try{
+    await copyText(text);
+    alert("분석용 기록을 복사했습니다! ChatGPT 채팅창에 붙여넣으세요.");
+  }catch(e){
+    prompt("아래 내용을 복사해 ChatGPT에 붙여넣으세요.",text);
+  }
+});
+
+$("backupBtn").addEventListener("click",()=>{
+  const data = {
+    app:"my-gym-record",
+    version:1,
+    exportedAt:new Date().toISOString(),
+    records:records
+  };
+
+  const blob = new Blob(
+    [JSON.stringify(data,null,2)],
+    {type:"application/json"}
+  );
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+
+  a.href = url;
+  a.download = "gym-record-backup-"+today()+".json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+
+$("restoreFile").addEventListener("change",async event=>{
+  const file = event.target.files[0];
+  if(!file) return;
+
+  try{
+    const parsed = JSON.parse(await file.text());
+    const incoming = Array.isArray(parsed)
+      ? parsed
+      : parsed.records;
+
+    if(!Array.isArray(incoming)){
+      throw new Error("invalid format");
+    }
+
+    const cleaned = incoming.map(cleanRecord).filter(Boolean);
+    const merged = new Map();
+
+    records.forEach(r=>merged.set(r.id,r));
+    cleaned.forEach(r=>{
+      if(!merged.has(r.id)) merged.set(r.id,r);
+    });
+
+    const previous = records;
+    records = prune(Array.from(merged.values()));
+
+    if(!saveRecords()){
+      records = previous;
+      return;
+    }
+
+    renderAll();
+
+    alert(
+      "백업 파일을 불러왔습니다.\\n"+
+      "최근 1년보다 오래된 기록은 복원되지 않습니다."
+    );
+
+  }catch(e){
+    alert("백업 파일을 읽지 못했습니다. 올바른 JSON 백업 파일인지 확인하세요.");
+  }finally{
+    event.target.value = "";
+  }
+});
+
+// 앱을 열 때 오래된 기록을 정리하고 저장한다.
+saveRecords();
+renderAll();
+
+</script>
+</body>
+</html>

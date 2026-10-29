@@ -596,5 +596,192 @@ persist();
 renderAll();
 
 </script>
+<!-- 휴식 타이머 -->
+<div class="card" id="restTimerCard">
+  <h2>⏱️ 세트 간 휴식 타이머</h2>
+
+  <label for="restPreset">휴식 시간</label>
+  <select id="restPreset"
+    style="width:100%;padding:12px;border-radius:8px;margin-bottom:10px">
+    <option value="30">30초</option>
+    <option value="60">60초</option>
+    <option value="90" selected>90초</option>
+    <option value="120">120초</option>
+    <option value="custom">직접 설정</option>
+  </select>
+
+  <div id="restCustomBox" style="display:none;margin-bottom:10px">
+    <label for="restCustom">원하는 시간 (초)</label>
+    <input id="restCustom" type="number" min="1" max="3600"
+      value="90" style="width:100%;padding:12px">
+  </div>
+
+  <div id="restDisplay"
+    style="font-size:52px;font-weight:bold;text-align:center;
+    padding:20px;color:#d9f99d">
+    01:30
+  </div>
+
+  <p id="restMessage" class="muted" style="text-align:center">
+    휴식 시간을 선택하고 시작하세요.
+  </p>
+
+  <div style="display:flex;gap:8px">
+    <button id="restStart" style="flex:1">▶ 시작</button>
+    <button id="restPause" class="secondary" style="flex:1">
+      ⏸ 일시정지
+    </button>
+    <button id="restReset" class="secondary" style="flex:1">
+      ↻ 초기화
+    </button>
+  </div>
+
+  <p class="muted" style="margin-top:12px">
+    휴식이 끝나면 소리 없이 진동으로 알려 줍니다.
+  </p>
+</div>
+
+<script>
+(function () {
+  const preset = document.getElementById("restPreset");
+  const customBox = document.getElementById("restCustomBox");
+  const custom = document.getElementById("restCustom");
+  const display = document.getElementById("restDisplay");
+  const message = document.getElementById("restMessage");
+  const startBtn = document.getElementById("restStart");
+  const pauseBtn = document.getElementById("restPause");
+  const resetBtn = document.getElementById("restReset");
+
+  let remaining = 90;
+  let endTime = 0;
+  let timer = null;
+  let running = false;
+
+  function selectedSeconds() {
+    let seconds = preset.value === "custom"
+      ? Number(custom.value)
+      : Number(preset.value);
+
+    if (!Number.isFinite(seconds) ||
+        seconds < 1 || seconds > 3600) {
+      alert("휴식 시간은 1초부터 3600초까지 설정해 주세요.");
+      return null;
+    }
+
+    return Math.floor(seconds);
+  }
+
+  function formatTime(seconds) {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+
+    return String(m).padStart(2, "0") + ":" +
+           String(s).padStart(2, "0");
+  }
+
+  function showTime() {
+    display.textContent = formatTime(remaining);
+  }
+
+  function stopTimer() {
+    if (timer !== null) {
+      clearInterval(timer);
+      timer = null;
+    }
+    running = false;
+  }
+
+  function finishTimer() {
+    stopTimer();
+    remaining = 0;
+    showTime();
+    message.textContent = "휴식 종료! 다음 세트를 시작하세요.";
+
+    // 지원되는 브라우저에서만 진동
+    if ("vibrate" in navigator) {
+      navigator.vibrate([300, 150, 300]);
+    } else {
+      message.textContent =
+        "휴식 종료! 이 브라우저에서는 진동을 지원하지 않습니다.";
+    }
+  }
+
+  function tick() {
+    remaining = Math.max(
+      0,
+      Math.ceil((endTime - Date.now()) / 1000)
+    );
+
+    showTime();
+
+    if (remaining <= 0) {
+      finishTimer();
+    }
+  }
+
+  function resetTimer() {
+    stopTimer();
+
+    if ("vibrate" in navigator) {
+      navigator.vibrate(0);
+    }
+
+    const seconds = selectedSeconds();
+
+    if (seconds === null) return;
+
+    remaining = seconds;
+    showTime();
+    message.textContent = "휴식 시간을 선택하고 시작하세요.";
+  }
+
+  preset.addEventListener("change", function () {
+    customBox.style.display =
+      preset.value === "custom" ? "block" : "none";
+
+    if (!running) resetTimer();
+  });
+
+  custom.addEventListener("change", function () {
+    if (preset.value === "custom" && !running) {
+      resetTimer();
+    }
+  });
+
+  startBtn.addEventListener("click", function () {
+    if (running) return;
+
+    if (remaining <= 0) {
+      const seconds = selectedSeconds();
+      if (seconds === null) return;
+      remaining = seconds;
+    }
+
+    running = true;
+    endTime = Date.now() + remaining * 1000;
+    message.textContent = "휴식 중...";
+
+    timer = setInterval(tick, 200);
+    tick();
+  });
+
+  pauseBtn.addEventListener("click", function () {
+    if (!running) return;
+
+    remaining = Math.max(
+      0,
+      Math.ceil((endTime - Date.now()) / 1000)
+    );
+
+    stopTimer();
+    showTime();
+    message.textContent = "일시정지 상태입니다.";
+  });
+
+  resetBtn.addEventListener("click", resetTimer);
+
+  showTime();
+})();
+</script>
 </body>
 </html>

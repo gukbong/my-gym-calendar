@@ -80,7 +80,14 @@ footer{color:#9ca3af;font-size:12px;line-height:1.7;padding:5px}
 <option value="트라이셉스 푸시다운">
 <option value="카프 레이즈">
 </datalist>
-
+<!-- 지난 운동 기록 -->
+<div id="previousWorkout" class="entry" style="display:none;margin-top:12px">
+  <strong id="previousTitle">📋 지난 운동 기록</strong>
+  <div id="previousSets"></div>
+  <button id="loadPrevious" class="secondary" style="width:100%;margin-top:10px">
+    📥 지난 기록 불러오기
+  </button>
+</div>
 <h3 style="font-size:15px;margin:18px 0 8px">세트별 기록</h3>
 
 <div class="set-row muted">
@@ -397,7 +404,74 @@ function renderRecords(){
     box.appendChild(item);
   });
 }
+// 지난 운동 기록 찾아서 표시하기
+function renderPrevious(){
+  const exercise = $("exercise").value.trim().toLowerCase();
+  const date = $("date").value || today();
 
+  const box = $("previousWorkout");
+  const title = $("previousTitle");
+  const setsBox = $("previousSets");
+  const loadBtn = $("loadPrevious");
+
+  if(!exercise){
+    box.style.display = "none";
+    return;
+  }
+
+  box.style.display = "block";
+  setsBox.replaceChildren();
+
+  const previous = records
+    .filter(r =>
+      r.exercise.trim().toLowerCase() === exercise &&
+      r.date < date
+    )
+    .sort((a,b) => b.date.localeCompare(a.date))[0];
+
+  if(!previous){
+    title.textContent = "📋 지난 운동 기록";
+    setsBox.appendChild(
+      node("p","muted","이 날짜 이전의 운동 기록이 없습니다.")
+    );
+    loadBtn.style.display = "none";
+    return;
+  }
+
+  title.textContent =
+    "📋 지난 기록 · " + previous.date;
+
+  previous.sets.forEach((s,i) => {
+    setsBox.appendChild(
+      node("p","", (i+1) + "세트: " +
+        s.weight + "kg × " + s.reps + "회")
+    );
+  });
+
+  loadBtn.style.display = "block";
+
+  loadBtn.onclick = function(){
+    $("setRows").replaceChildren();
+
+    previous.sets.forEach(s => {
+      addSetRow(s.weight, s.reps);
+    });
+
+    $("note").value = "";
+    alert("지난 운동 기록을 불러왔습니다!");
+  };
+}
+
+// 운동 종목이나 날짜가 바뀌면 지난 기록 갱신
+$("exercise").addEventListener("input", renderPrevious);
+$("date").addEventListener("change", renderPrevious);
+
+// 운동 기록 저장 후에도 화면 갱신
+$("saveBtn").addEventListener("click", function(){
+  setTimeout(renderPrevious, 100);
+});
+
+renderPrevious();
 function renderStats(){
   $("totalRecords").textContent=records.length+"개";
   $("totalDays").textContent=new Set(records.map(r=>r.date)).size+"일";

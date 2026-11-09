@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -706,10 +706,7 @@ placeholder="예: 마지막 세트가 힘들었음">
 </button>
 
 </div>
-<div class="card" id="recordCard" style="display:none">
-<h2 id="recordTitle">📋 운동 기록</h2>
-<div id="records"></div>
-</div>
+
 
 <details class="card">
 <summary>📊 운동 통계</summary>
@@ -1784,114 +1781,6 @@ function volume(r){
   return r.sets.reduce((sum,s)=>sum+s.weight*s.reps,0);
 }
 
-function renderRecords(){
-  $("recordTitle").textContent="📋 "+selectedDate+" 운동 기록";
-
-  const box=$("records");
-  box.replaceChildren();
-
-  const list=records.filter(r=>r.date===selectedDate);
-
-  if(!list.length){
-    box.appendChild(
-      node("p","muted","이 날짜에는 운동 기록이 없습니다.")
-    );
-    return;
-  }
-
-  list.forEach(r=>{
-    const item=node("div","entry");
-
-    // 운동 이름과 펼치기 버튼
-    const header=document.createElement("div");
-    header.style.display="flex";
-    header.style.alignItems="center";
-    header.style.justifyContent="space-between";
-    header.style.gap="8px";
-
-    // 왼쪽 영역
-    const left=document.createElement("div");
-    left.style.display="flex";
-    left.style.alignItems="center";
-    left.style.gap="8px";
-    left.style.flex="1";
-    left.style.minWidth="0";
-
-    const title=node("strong","",r.exercise);
-
-    // 세부 기록 펼치기 버튼
-    const toggle=node("button","secondary small","＋");
-    toggle.type="button";
-    toggle.title="세부 운동 기록 보기";
-    toggle.style.width="34px";
-    toggle.style.minWidth="34px";
-    toggle.style.padding="0";
-    toggle.style.fontSize="18px";
-
-    // 오른쪽 삭제 버튼
-    const del=node("button","danger small","×");
-    del.type="button";
-    del.title="운동 기록 삭제";
-    del.style.width="38px";
-    del.style.minWidth="38px";
-    del.style.padding="0";
-    del.style.fontSize="20px";
-
-    // 세부 기록 영역
-    const details=document.createElement("div");
-    details.style.display="none";
-    details.style.paddingLeft="4px";
-
-    // 세트별 운동 기록
-    r.sets.forEach((s,i)=>{
-      details.appendChild(
-        node("p","",(i+1)+"세트: "+s.weight+"kg × "+s.reps+"회")
-      );
-    });
-
-    const totalReps=r.sets.reduce(
-      (sum,s)=>sum+s.reps,0
-    );
-
-    details.appendChild(
-      node("p","muted",
-        r.sets.length+"세트 · 총 "+totalReps+
-        "회 · 운동량 "+volume(r).toLocaleString("ko-KR")+"kg"
-      )
-    );
-
-    if(r.note){
-      details.appendChild(node("p","",r.note));
-    }
-
-    // 펼치기 / 접기
-    toggle.addEventListener("click",()=>{
-      const isOpen=details.style.display!=="none";
-
-      details.style.display=isOpen?"none":"block";
-      toggle.textContent=isOpen?"＋":"－";
-      toggle.title=isOpen
-        ?"세부 운동 기록 보기"
-        :"세부 운동 기록 접기";
-    });
-
-    // 기록 삭제
-    del.addEventListener("click",()=>{
-      if(!confirm("이 운동 기록을 삭제할까요?"))return;
-
-      records=records.filter(x=>x.id!==r.id);
-
-      if(persist())renderAll();
-    });
-
-    left.append(title,toggle);
-    header.append(left,del);
-
-    item.append(header,details);
-    box.appendChild(item);
-  });
-}
-
 // 지난 운동 기록 찾아서 표시하기
 function renderPrevious(){
   const exercise = $("exercise").value.trim().toLowerCase();
@@ -1972,7 +1861,6 @@ function renderStats(){
 function renderAll(){
   renderCalendar();
   renderPlans();
-  renderRecords();
   renderStats();
   updateExerciseDates();
 }

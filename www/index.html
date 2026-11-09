@@ -1024,27 +1024,17 @@ function renderPlans(){
     open.style.width = "auto";
 
     open.addEventListener("click",()=>{
-      openWorkoutEditor(entry.exercise);
+      if(entry.records.length){
+        const isOpen = details.style.display !== "none";
+        details.style.display = isOpen ? "none" : "block";
+      }else{
+        openWorkoutEditor(entry.exercise);
+      }
     });
 
     header.appendChild(open);
 
-    // 운동 기록 펼치기
-    let toggle = null;
-
-    if(entry.records.length){
-
-      toggle = node(
-        "button",
-        "secondary small",
-        "기록 ▾"
-      );
-
-      toggle.style.width = "auto";
-      toggle.style.minWidth = "65px";
-
-      header.appendChild(toggle);
-    }
+    // 기록 버튼 제거 완료
 
     // 운동 계획 삭제
     if(entry.plan){
@@ -1185,22 +1175,25 @@ function renderPlans(){
 
     });
 
-    // 펼치기 / 접기
-    if(toggle){
 
-      toggle.addEventListener("click",()=>{
 
-        const isOpen =
-          details.style.display !== "none";
+    if(entry.records.length){
 
-        details.style.display =
-          isOpen ? "none" : "block";
+      const addRecord = node(
+        "button",
+        "primary small",
+        "＋ 추가 운동 기록"
+      );
 
-        toggle.textContent =
-          isOpen ? "기록 ▾" : "기록 ▴";
+      addRecord.type = "button";
+      addRecord.style.width = "auto";
+      addRecord.style.marginTop = "10px";
 
+      addRecord.addEventListener("click",()=>{
+        openWorkoutEditor(entry.exercise);
       });
 
+      details.appendChild(addRecord);
     }
 
     item.append(header,details);

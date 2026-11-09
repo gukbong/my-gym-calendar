@@ -7,33 +7,193 @@
 <title>나만의 헬스 기록</title>
 
 <style>
-*{box-sizing:border-box}
-body{
-  margin:0;padding:14px;background:#111827;color:#f9fafb;
-  font-family:Arial,sans-serif
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
 }
-main{max-width:600px;margin:auto}
-h1{font-size:25px}
-h2{font-size:18px;margin:0 0 14px}
-.card{background:#1f2937;border-radius:14px;padding:16px;margin-bottom:15px}
-label{display:block;font-size:13px;color:#d1d5db;margin:12px 0 6px}
-input,textarea,button{font:inherit;border-radius:8px;padding:11px}
-input,textarea{width:100%;background:#111827;color:white;border:1px solid #4b5563}
-button{border:0;background:#d9f99d;color:#17200b;font-weight:bold;cursor:pointer}
-button:active{opacity:.7}
-.primary{width:100%;margin-top:14px}
-.secondary{background:#374151;color:white}
-.danger{background:#7f1d1d;color:white}
-.small{padding:8px;font-size:13px}
-.muted{color:#9ca3af;font-size:13px;line-height:1.6}
-.row{display:flex;gap:8px}
-.row>div{flex:1;min-width:0}
+
+body{
+  margin:0;
+  padding:18px 14px;
+  padding-bottom:30px;
+  background:#0b1120;
+  color:#f8fafc;
+  font-family:Arial,sans-serif;
+}
+
+main{
+  max-width:600px;
+  margin:auto;
+}
+
+h1{
+  font-size:26px;
+  font-weight:800;
+  letter-spacing:-0.8px;
+  margin:12px 0 5px;
+}
+
+h2{
+  font-size:18px;
+  font-weight:750;
+  margin:0 0 16px;
+}
+
+.card{
+  background:#182235;
+  border:1px solid #263449;
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:16px;
+  box-shadow:0 5px 18px rgba(0,0,0,.16);
+}
+
+/* 중첩된 카드의 이중 테두리 방지 */
+.card .card{
+  background:transparent;
+  border:0;
+  box-shadow:none;
+  padding:0;
+  margin:0;
+}
+
+label{
+  display:block;
+  font-size:13px;
+  font-weight:600;
+  color:#cbd5e1;
+  margin:15px 0 7px;
+}
+
+input,textarea,select,button{
+  font:inherit;
+  border-radius:11px;
+}
+
+input,textarea,select{
+  width:100%;
+  min-height:46px;
+  padding:12px;
+  background:#0f172a;
+  color:#f8fafc;
+  border:1px solid #334155;
+  outline:none;
+}
+
+input:focus,textarea:focus,select:focus{
+  border-color:#a3e635;
+  box-shadow:0 0 0 2px rgba(163,230,53,.15);
+}
+/* 운동 종목 선택 목록 */
+.exercise-picker{
+  position:relative;
+}
+
+.exercise-suggestions{
+  position:absolute;
+  top:calc(100% + 4px);
+  left:0;
+  right:0;
+  z-index:9999;
+
+  max-height:220px;
+  overflow-y:auto;
+
+  background:#182235;
+  border:1px solid #475569;
+  border-radius:12px;
+  padding:5px;
+
+  box-shadow:0 8px 20px rgba(0,0,0,.4);
+}
+
+.exercise-suggestions[hidden]{
+  display:none !important;
+}
+
+.exercise-suggestions button{
+  display:block;
+  width:100%;
+  text-align:left;
+  background:#253449;
+  color:#f8fafc;
+  border-radius:8px;
+  padding:12px;
+  margin:2px 0;
+  min-height:44px;
+}
+button{
+  min-height:44px;
+  padding:11px 14px;
+  border:0;
+  background:#a3e635;
+  color:#17200b;
+  font-weight:750;
+  cursor:pointer;
+  transition:opacity .15s;
+}
+
+button:active{
+  opacity:.7;
+}
+
+button:disabled{
+  opacity:.4;
+  cursor:not-allowed;
+}
+
+.primary{
+  width:100%;
+  margin-top:14px;
+  min-height:48px;
+  font-size:15px;
+}
+
+.secondary{
+  background:#334155;
+  color:#f8fafc;
+}
+
+.danger{
+  background:#991b1b;
+  color:white;
+}
+
+.small{
+  min-height:36px;
+  padding:7px 10px;
+  font-size:12px;
+}
+
+.muted{
+  color:#94a3b8;
+  font-size:13px;
+  line-height:1.6;
+}
+
+.row{
+  display:flex;
+  gap:8px;
+}
+
+.row>div{
+  flex:1;
+  min-width:0;
+}
+
+/* 운동 세트 */
 .set-row{
   display:grid;
-  grid-template-columns:35px minmax(0,1fr) minmax(0,1fr) 38px 42px;
+  grid-template-columns:30px minmax(0,1fr) minmax(0,1fr) 38px 42px;
   gap:6px;
   align-items:center;
-  margin-top:8px;
+  margin-top:10px;
+}
+
+.set-row input{
+  min-width:0;
+  padding:10px 5px;
+  min-height:42px;
 }
 
 .set-row input[type="checkbox"]{
@@ -41,51 +201,330 @@ button:active{opacity:.7}
   height:20px;
   padding:0;
   justify-self:center;
-  accent-color:#d9f99d;
+  accent-color:#a3e635;
+}
+
+.set-number{
+  text-align:center;
+  color:#a3e635;
+  font-weight:bold;
+}
+
+.set-row.set-complete{
+  background:#193b30;
+  border-radius:10px;
+  padding:5px;
 }
 
 .set-row.set-complete .set-number{
   color:#86efac;
 }
-.set-row input{min-width:0;padding:10px 5px}
-.set-number{text-align:center;color:#d9f99d;font-weight:bold}
-.calendar-head{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:12px}
-.calendar-head strong{font-size:16px}
-.week,.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center}
-.week div{padding:7px 0;color:#9ca3af;font-size:12px}
-.day{padding:10px 0;min-width:0;background:#374151;color:white;position:relative;font-size:13px}
-.day.selected{outline:2px solid #d9f99d}
-.day.today{color:#d9f99d}
-.day.has-record:after{content:"";position:absolute;bottom:3px;left:calc(50% - 3px);width:6px;height:6px;border-radius:50%;background:#d9f99d}
-.entry{background:#374151;border-radius:10px;padding:12px;margin-top:9px;overflow-wrap:anywhere}
-.entry p{margin:7px 0;font-size:14px;line-height:1.6}
-.entry-actions{display:flex;gap:8px;margin-top:10px}
-.stat{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #374151}
-footer{color:#9ca3af;font-size:12px;line-height:1.7;padding:5px}
+
+/* 운동 달력 */
+.calendar-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:6px;
+  margin-bottom:12px;
+}
+
+.calendar-head strong{
+  font-size:17px;
+  color:#a3e635;
+}
+
+.week,.days{
+  display:grid;
+  grid-template-columns:repeat(7,minmax(0,1fr));
+  gap:5px;
+  text-align:center;
+}
+
+.week div{
+  padding:9px 0;
+  color:#94a3b8;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.day{
+  min-height:43px;
+  padding:10px 0;
+  background:#263449;
+  color:white;
+  position:relative;
+  font-size:13px;
+  border-radius:10px;
+}
+
+.day.selected{
+  outline:2px solid #a3e635;
+  background:#3a512b;
+  color:#d9f99d;
+  font-weight:bold;
+}
+
+.day.today{
+  color:#a3e635;
+  font-weight:bold;
+}
+
+.day.has-record:after{
+  content:"";
+  position:absolute;
+  bottom:4px;
+  left:calc(50% - 3px);
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#a3e635;
+}
+
+/* 운동 목록 */
+.entry{
+  background:#253449;
+  border:1px solid #334155;
+  border-radius:13px;
+  padding:13px;
+  margin-top:10px;
+  overflow-wrap:anywhere;
+}
+
+.entry p{
+  margin:7px 0;
+  font-size:14px;
+  line-height:1.6;
+}
+
+.entry-actions{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+
+/* 통계 */
+.stat{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 2px;
+  border-bottom:1px solid #334155;
+  font-size:14px;
+}
+
+.stat:last-child{
+  border-bottom:0;
+}
+
 /* 접기 및 펼치기 */
-details.card > summary {
-  cursor: pointer;
-  font-size: 17px;
-  font-weight: bold;
-  list-style: none;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 4px 0;
+details.card>summary{
+  cursor:pointer;
+  font-size:17px;
+  font-weight:bold;
+  list-style:none;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:4px 0;
 }
 
-details.card > summary::-webkit-details-marker {
-  display: none;
+details.card>summary::-webkit-details-marker{
+  display:none;
 }
 
-details.card > summary::after {
-  content: "＋";
-  font-size: 20px;
-  color: #d9f99d;
+details.card>summary::after{
+  content:"＋";
+  font-size:20px;
+  color:#a3e635;
 }
 
-details.card[open] > summary::after {
-  content: "－";
+details.card[open]>summary::after{
+  content:"－";
+}
+
+/* 하단 */
+footer{
+  color:#94a3b8;
+  font-size:12px;
+  line-height:1.7;
+  padding:8px 4px;
+}
+
+/* 작은 휴대폰 대응 */
+@media(max-width:380px){
+
+  body{
+    padding:12px 10px;
+  }
+
+  .card{
+    padding:14px;
+  }
+
+  .day{
+    min-height:39px;
+    padding:9px 0;
+  }
+
+  .set-row{
+    gap:4px;
+    grid-template-columns:27px minmax(0,1fr) minmax(0,1fr) 34px 38px;
+  }
+
+}
+/* 운동 기록 화면 개선 */
+
+#workoutEditor h2{
+  font-size:21px;
+  margin-bottom:16px;
+}
+
+#workoutEditor #backToPlan{
+  width:100%;
+  min-height:44px;
+  margin-bottom:10px;
+}
+
+.workout-section-heading{
+  margin-top:22px;
+  margin-bottom:12px;
+}
+
+.workout-section-heading h3{
+  font-size:17px;
+  margin:0 0 6px;
+}
+
+.workout-section-heading p{
+  font-size:12px;
+  color:#94a3b8;
+  margin:0;
+  line-height:1.5;
+}
+
+.set-row-head{
+  margin-top:12px;
+  padding:0 5px;
+  font-size:11px;
+  font-weight:bold;
+}
+
+.set-row:not(.set-row-head){
+  background:#253449;
+  border:1px solid #334155;
+  border-radius:12px;
+  padding:7px 5px;
+}
+
+.set-row.set-complete{
+  background:#193b30;
+  border-color:#4ade80;
+}
+
+.workout-set-actions{
+  margin-top:14px;
+}
+
+.workout-set-actions button{
+  min-height:46px;
+}
+
+#workoutEditor textarea{
+  min-height:75px;
+  resize:vertical;
+}
+
+#workoutEditor #saveBtn{
+  min-height:55px;
+  font-size:16px;
+  margin-top:20px;
+}
+/* 운동 기록 입력 화면 간격 및 터치 개선 */
+
+#workoutEditor .set-row{
+  grid-template-columns:
+    30px minmax(0,1fr) minmax(0,1fr) 42px 38px;
+  gap:6px;
+}
+
+/* 세트 입력 영역 */
+#workoutEditor .set-row:not(.set-row-head){
+  min-height:58px;
+  padding:8px 6px;
+}
+
+/* 중량과 횟수 입력 */
+#workoutEditor .set-row input:not([type="checkbox"]){
+  min-height:46px;
+  padding:10px 6px;
+  text-align:center;
+  font-size:16px;
+}
+
+/* 완료 체크 */
+#workoutEditor .set-row input[type="checkbox"]{
+  width:24px;
+  height:24px;
+  min-height:24px;
+  cursor:pointer;
+}
+
+/* 세트 삭제 버튼 */
+#workoutEditor .set-row button{
+  width:36px;
+  min-width:36px;
+  min-height:38px;
+  padding:0;
+  font-size:20px;
+  justify-self:center;
+}
+
+/* 세트 제목 정렬 */
+#workoutEditor .set-row-head > div{
+  text-align:center;
+}
+
+/* 작은 화면 */
+@media(max-width:420px){
+
+  #workoutEditor .set-row{
+    grid-template-columns:
+      26px minmax(0,1fr) minmax(0,1fr) 38px 34px;
+    gap:4px;
+  }
+
+  #workoutEditor .set-row button{
+    width:32px;
+    min-width:32px;
+  }
+
+}
+/* 운동 계획 목록 간격 개선 */
+
+#plannedExercises .entry{
+  padding:9px;
+  margin-top:8px;
+  gap:10px !important;
+}
+
+/* 운동 이름 버튼 */
+#plannedExercises .entry > button.secondary{
+  min-width:0;
+  min-height:46px;
+  padding:10px 12px;
+  text-align:left;
+  overflow-wrap:anywhere;
+}
+
+/* 계획 삭제 버튼 */
+#plannedExercises .entry > button.danger{
+  width:38px !important;
+  min-width:38px !important;
+  height:42px;
+  padding:0 !important;
+  font-size:20px;
+  flex-shrink:0;
 }
 </style>
 </head>
@@ -120,32 +559,81 @@ details.card[open] > summary::after {
 
 <h2 id="planTitle">📋 오늘의 운동 계획</h2>
 
-<label for="planExercise">운동 종목 추가</label>
+<label for="planCategory">운동 부위 선택</label>
 
-<input id="planExercise"
-list="exerciseList"
-placeholder="예: 벤치프레스">
+<select id="planCategory">
+  <option value="가슴">가슴</option>
+  <option value="등">등</option>
+  <option value="어깨">어깨</option>
+  <option value="하체">하체</option>
+  <option value="이두">이두</option>
+  <option value="삼두">삼두</option>
+  <option value="복근">복근</option>
+  <option value="기타">기타</option>
+</select>
 
-<datalist id="exerciseList">
-<option value="벤치프레스">
-<option value="인클라인 벤치프레스">
-<option value="덤벨 프레스">
-<option value="스쿼트">
-<option value="레그프레스">
-<option value="레그컬">
-<option value="레그익스텐션">
-<option value="데드리프트">
-<option value="랫풀다운">
-<option value="시티드 로우">
-<option value="바벨 로우">
-<option value="숄더프레스">
-<option value="사이드 레터럴 레이즈">
-<option value="덤벨 컬">
-<option value="바벨 컬">
-<option value="트라이셉스 푸시다운">
-<option value="카프 레이즈">
-</datalist>
+<label for="planExercise">운동 종목 선택 또는 직접 입력</label>
 
+<div class="exercise-picker">
+
+  <input
+    id="planExercise"
+    autocomplete="off"
+    placeholder="운동 종목을 선택하거나 입력하세요"
+  >
+
+  <div id="exerciseSuggestions"
+       class="exercise-suggestions"
+       hidden>
+  </div>
+
+</div>
+
+<datalist id="exerciseList"></datalist>
+<!-- 사용자 지정 운동 종목 관리 -->
+<details style="margin-top:12px">
+
+  <summary style="
+    cursor:pointer;
+    color:#a3e635;
+    font-size:14px;
+    padding:12px;
+    background:#263449;
+    border-radius:8px;
+  ">
+    ＋ 내 운동 종목 관리
+  </summary>
+
+  <div style="padding-top:10px">
+
+    <button id="saveCustomExercise"
+      class="secondary"
+      type="button"
+      style="width:100%;margin-top:5px">
+      ＋ 내 운동 종목으로 저장
+    </button>
+
+    <label for="customExerciseToDelete">
+      내 운동 종목 삭제
+    </label>
+
+    <div class="row">
+      <div>
+        <select id="customExerciseToDelete">
+          <option value="">삭제할 종목 선택</option>
+        </select>
+      </div>
+
+      <button id="deleteCustomExercise"
+        class="danger"
+        type="button">
+        삭제
+      </button>
+    </div>
+
+  </div>
+
+</details>
 <button id="addPlanExercise" class="primary">
 ＋ 운동 계획 추가
 </button>
@@ -183,28 +671,27 @@ style="width:100%;margin-top:10px">
 </button>
 </div>
 
-<h3 style="font-size:15px;margin:18px 0 8px">
-세트별 기록
-</h3>
+<div class="workout-section-heading">
+  <div>
+    <h3>💪 세트별 운동 기록</h3>
+    <p>중량과 횟수를 입력하고 완료한 세트를 체크하세요.</p>
+  </div>
+</div>
 
-<div class="set-row muted">
-<div>세트</div>
-<div>중량(kg)</div>
-<div>횟수</div>
-<div>완료</div>
-<div></div>
+<div class="set-row set-row-head muted">
+  <div>세트</div>
+  <div>중량(kg)</div>
+  <div>횟수</div>
+  <div>완료</div>
+  <div>삭제</div>
 </div>
 
 <div id="setRows"></div>
 
-<div class="row" style="margin-top:12px">
-<button id="addSet" class="secondary" style="flex:1">
-＋ 세트 추가
-</button>
-
-<button id="removeLastSet" class="secondary" style="flex:1">
-－ 마지막 세트
-</button>
+<div class="row workout-set-actions">
+  <button id="addSet" class="secondary" style="flex:1">
+    ＋ 세트 추가
+  </button>
 </div>
 
 <label for="note">운동 메모</label>
@@ -219,7 +706,7 @@ placeholder="예: 마지막 세트가 힘들었음">
 </button>
 
 </div>
-<div class="card">
+<div class="card" id="recordCard" style="display:none">
 <h2 id="recordTitle">📋 운동 기록</h2>
 <div id="records"></div>
 </div>
@@ -461,61 +948,587 @@ function persistPlans(){
 function renderPlans(){
 
   $("planTitle").textContent =
-    "📋 " + selectedDate + " 운동 계획";
+    "📋 " + selectedDate + " 운동";
 
   const box = $("plannedExercises");
   box.replaceChildren();
 
-  const list = dailyPlans[selectedDate] || [];
+  const plans = dailyPlans[selectedDate] || [];
 
-  if(!list.length){
+  const dayRecords = records.filter(
+    r => r.date === selectedDate
+  );
+
+  const key = value =>
+    String(value || "").trim().toLowerCase();
+
+  // 운동 계획과 운동 기록 연결
+  const entries = plans.map(plan => ({
+    exercise: plan.exercise,
+    plan,
+    records: dayRecords.filter(
+      r => key(r.exercise) === key(plan.exercise)
+    )
+  }));
+
+  // 계획에는 없지만 기록에 남아 있는 운동도 표시
+  const planKeys = new Set(
+    plans.map(p => key(p.exercise))
+  );
+
+  const unplanned = new Map();
+
+  dayRecords.forEach(record => {
+
+    const k = key(record.exercise);
+
+    if(planKeys.has(k)) return;
+
+    if(!unplanned.has(k)){
+      unplanned.set(k,{
+        exercise:record.exercise,
+        plan:null,
+        records:[]
+      });
+    }
+
+    unplanned.get(k).records.push(record);
+
+  });
+
+  entries.push(...unplanned.values());
+
+  if(!entries.length){
     box.appendChild(
-      node("p","muted","등록된 운동 계획이 없습니다.")
+      node("p","muted","등록된 운동 계획이나 기록이 없습니다.")
     );
     return;
   }
 
-  list.forEach((item,index)=>{
+  entries.forEach(entry => {
 
-    const row = node("div","entry");
+    const item = node("div","entry");
 
-    const label = item.completed ? "✅ " : "🏋️ ";
+    const header = document.createElement("div");
 
+    header.style.display = "flex";
+    header.style.alignItems = "center";
+    header.style.gap = "8px";
+
+    // 운동 종목 버튼
     const open = node(
       "button",
       "secondary",
-      label + item.exercise
+      (entry.records.length ? "✅ " : "🏋️ ") +
+      entry.exercise
     );
 
-    open.style.width = "100%";
+    open.style.flex = "1";
+    open.style.width = "auto";
 
     open.addEventListener("click",()=>{
-      openWorkoutEditor(item.exercise);
+      openWorkoutEditor(entry.exercise);
     });
 
-    const del = node(
-      "button",
-      "danger small",
-      "계획 삭제"
+    header.appendChild(open);
+
+    // 운동 기록 펼치기
+    let toggle = null;
+
+    if(entry.records.length){
+
+      toggle = node(
+        "button",
+        "secondary small",
+        "기록 ▾"
+      );
+
+      toggle.style.width = "auto";
+      toggle.style.minWidth = "65px";
+
+      header.appendChild(toggle);
+    }
+
+    // 운동 계획 삭제
+    if(entry.plan){
+
+      const del = node(
+        "button",
+        "danger small",
+        "×"
+      );
+
+      del.type = "button";
+      del.title = "운동 계획 삭제";
+      del.style.width = "38px";
+      del.style.minWidth = "38px";
+      del.style.padding = "0";
+      del.style.fontSize = "20px";
+
+      del.addEventListener("click",()=>{
+
+        if(!confirm(entry.exercise+" 계획을 삭제할까요?")){
+          return;
+        }
+
+        const previous = [...plans];
+
+        plans.splice(
+          plans.indexOf(entry.plan),
+          1
+        );
+
+        if(persistPlans()){
+          renderAll();
+        }else{
+          dailyPlans[selectedDate] = previous;
+        }
+
+      });
+
+      header.appendChild(del);
+    }
+
+    // 기록 상세 영역
+    const details = document.createElement("div");
+
+    details.style.display = "none";
+    details.style.paddingTop = "10px";
+
+    entry.records.forEach((r,index)=>{
+
+      const recordBox = document.createElement("div");
+
+      recordBox.style.padding = "10px 0";
+      recordBox.style.borderTop = "1px solid #334155";
+
+      recordBox.appendChild(
+        node("strong","",
+          "운동 기록 "+(index+1)
+        )
+      );
+
+      const sets = r.sets || [];
+
+      sets.forEach((s,i)=>{
+
+        recordBox.appendChild(
+          node(
+            "p",
+            "",
+            (i+1)+"세트: "+
+            s.weight+"kg × "+s.reps+"회"
+          )
+        );
+
+      });
+
+      const totalReps = sets.reduce(
+        (sum,s)=>sum+(Number(s.reps)||0),
+        0
+      );
+
+      const totalVolume = sets.reduce(
+        (sum,s)=>
+          sum+
+          (Number(s.weight)||0)*
+          (Number(s.reps)||0),
+        0
+      );
+
+      recordBox.appendChild(
+        node(
+          "p",
+          "muted",
+          sets.length+"세트 · 총 "+
+          totalReps+"회 · 운동량 "+
+          totalVolume.toLocaleString("ko-KR")+"kg"
+        )
+      );
+
+      if(r.note){
+        recordBox.appendChild(
+          node("p","",r.note)
+        );
+      }
+
+      // 개별 운동 기록 삭제
+      const deleteRecord = node(
+        "button",
+        "danger small",
+        "× 기록 삭제"
+      );
+
+      deleteRecord.style.width = "auto";
+      deleteRecord.style.marginTop = "5px";
+
+      deleteRecord.addEventListener("click",()=>{
+
+        if(!confirm("이 운동 기록을 삭제할까요?")){
+          return;
+        }
+
+        const previous = records;
+
+        records = records.filter(
+          x => x.id !== r.id
+        );
+
+        if(persist()){
+          renderAll();
+        }else{
+          records = previous;
+        }
+
+      });
+
+      recordBox.appendChild(deleteRecord);
+
+      details.appendChild(recordBox);
+
+    });
+
+    // 펼치기 / 접기
+    if(toggle){
+
+      toggle.addEventListener("click",()=>{
+
+        const isOpen =
+          details.style.display !== "none";
+
+        details.style.display =
+          isOpen ? "none" : "block";
+
+        toggle.textContent =
+          isOpen ? "기록 ▾" : "기록 ▴";
+
+      });
+
+    }
+
+    item.append(header,details);
+
+    box.appendChild(item);
+
+  });
+
+}
+
+// 운동 부위별 종목 목록
+const exerciseCategories = {
+
+  "가슴": [
+    "벤치프레스",
+    "인클라인 벤치프레스",
+    "덤벨 프레스",
+    "인클라인 덤벨 프레스",
+    "체스트 프레스",
+    "펙덱 플라이",
+    "케이블 크로스오버"
+  ],
+
+  "등": [
+    "데드리프트",
+    "랫풀다운",
+    "시티드 로우",
+    "바벨 로우",
+    "원암 덤벨 로우",
+    "풀업",
+    "백 익스텐션"
+  ],
+
+  "어깨": [
+    "숄더프레스",
+    "덤벨 숄더프레스",
+    "사이드 레터럴 레이즈",
+    "프론트 레이즈",
+    "리어 델트 플라이",
+    "페이스 풀"
+  ],
+
+  "하체": [
+    "스쿼트",
+    "레그프레스",
+    "레그컬",
+    "레그익스텐션",
+    "런지",
+    "루마니안 데드리프트",
+    "카프 레이즈",
+    "힙 쓰러스트"
+  ],
+
+  "이두": [
+    "덤벨 컬",
+    "바벨 컬",
+    "해머 컬",
+    "케이블 컬",
+    "프리처 컬"
+  ],
+
+  "삼두": [
+    "트라이셉스 푸시다운",
+    "오버헤드 트라이셉스 익스텐션",
+    "라잉 트라이셉스 익스텐션",
+    "딥스"
+  ],
+
+  "복근": [
+    "크런치",
+    "레그레이즈",
+    "행잉레그레이즈",
+    "플랭크",
+    "케이블 크런치"
+],
+
+  "기타": []
+};
+
+
+// 사용자 지정 운동 종목 저장
+const CUSTOM_EXERCISES_KEY = "myGymCustomExercisesV1";
+
+function loadCustomExercises(){
+  try{
+    const data = JSON.parse(
+      localStorage.getItem(CUSTOM_EXERCISES_KEY) || "{}"
     );
 
-    del.addEventListener("click",()=>{
+    const result = {};
 
-      if(!confirm(item.exercise+" 계획을 삭제할까요?"))return;
-
-      dailyPlans[selectedDate].splice(index,1);
-
-      if(persistPlans()){
-        renderPlans();
-      }
+    Object.keys(exerciseCategories).forEach(category=>{
+      result[category] = Array.isArray(data[category])
+        ? data[category].filter(
+            x => typeof x === "string" && x.trim()
+          )
+        : [];
     });
 
-    row.append(open,del);
-    box.appendChild(row);
+    return result;
+
+  }catch(e){
+    return {};
+  }
+}
+
+let customExercises = loadCustomExercises();
+
+function persistCustomExercises(){
+  try{
+    localStorage.setItem(
+      CUSTOM_EXERCISES_KEY,
+      JSON.stringify(customExercises)
+    );
+    return true;
+
+  }catch(e){
+    alert("사용자 지정 종목 저장에 실패했습니다.");
+    return false;
+  }
+}
+
+
+// 사용자 지정 종목 삭제 목록
+function updateCustomExerciseDeleteOptions(){
+
+  const select = $("customExerciseToDelete");
+  const category = $("planCategory").value;
+
+  select.replaceChildren();
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "삭제할 종목 선택";
+
+  select.appendChild(placeholder);
+
+  (customExercises[category] || []).forEach(exercise=>{
+
+    const option = document.createElement("option");
+
+    option.value = exercise;
+    option.textContent = exercise;
+
+    select.appendChild(option);
   });
 }
 
 
+// 운동 부위에 맞는 종목 표시
+function updatePlanExerciseOptions(){
+
+  const category = $("planCategory").value;
+  const list = $("exerciseList");
+
+  list.replaceChildren();
+
+  const exercises = [
+    ...new Set([
+      ...(exerciseCategories[category] || []),
+      ...(customExercises[category] || [])
+    ])
+  ];
+
+  exercises.forEach(exercise=>{
+
+    const option = document.createElement("option");
+    option.value = exercise;
+
+    list.appendChild(option);
+  });
+
+  $("planExercise").value = "";
+
+  updateCustomExerciseDeleteOptions();
+  updateExerciseDates();
+}
+
+// 운동 종목 선택 목록 표시
+function renderExerciseSuggestions(){
+
+  const input = $("planExercise");
+  const box = $("exerciseSuggestions");
+
+  const keyword = input.value.trim().toLowerCase();
+
+  box.replaceChildren();
+
+  [...$("exerciseList").options]
+    .filter(option =>
+      option.value.toLowerCase().includes(keyword)
+    )
+    .forEach(option => {
+
+      const button = document.createElement("button");
+
+      button.type = "button";
+      button.textContent = option.label || option.value;
+
+      button.addEventListener("mousedown", e => {
+        e.preventDefault();
+      });
+
+      button.addEventListener("click", () => {
+
+        input.value = option.value;
+        box.hidden = true;
+
+      });
+
+      box.appendChild(button);
+
+    });
+
+  box.hidden = box.children.length === 0;
+}
+
+
+// 입력창 클릭 시 목록 표시
+$("planExercise").addEventListener(
+  "focus",
+  renderExerciseSuggestions
+);
+
+$("planExercise").addEventListener(
+  "click",
+  renderExerciseSuggestions
+);
+
+$("planExercise").addEventListener(
+  "input",
+  renderExerciseSuggestions
+);
+
+
+// 다른 곳을 클릭하면 목록 닫기
+document.addEventListener("click", e => {
+
+  if(!e.target.closest(".exercise-picker")){
+    $("exerciseSuggestions").hidden = true;
+  }
+
+});
+// 사용자 지정 운동 종목 추가
+$("saveCustomExercise").addEventListener("click",()=>{
+
+  const category = $("planCategory").value;
+  const exercise = $("planExercise").value.trim();
+
+  if(!exercise){
+    alert("추가할 운동 종목을 입력하세요.");
+    return;
+  }
+
+  const allExercises = [
+    ...(exerciseCategories[category] || []),
+    ...(customExercises[category] || [])
+  ];
+
+  if(allExercises.some(
+    x => x.toLowerCase() === exercise.toLowerCase()
+  )){
+    alert("이미 등록된 운동 종목입니다.");
+    return;
+  }
+
+  if(!customExercises[category]){
+    customExercises[category] = [];
+  }
+
+  customExercises[category].push(exercise);
+
+  if(!persistCustomExercises()){
+    customExercises[category].pop();
+    return;
+  }
+
+  updatePlanExerciseOptions();
+
+  $("planExercise").value = exercise;
+
+  alert("내 운동 종목에 추가했습니다!");
+});
+
+
+// 사용자 지정 운동 종목 삭제
+$("deleteCustomExercise").addEventListener("click",()=>{
+
+  const category = $("planCategory").value;
+  const exercise = $("customExerciseToDelete").value;
+
+  if(!exercise){
+    alert("삭제할 운동 종목을 선택하세요.");
+    return;
+  }
+
+  if(!confirm(exercise + " 종목을 삭제할까요?")){
+    return;
+  }
+
+  const previous = [...customExercises[category]];
+
+  customExercises[category] =
+    previous.filter(x => x !== exercise);
+
+  if(!persistCustomExercises()){
+    customExercises[category] = previous;
+    return;
+  }
+
+  updatePlanExerciseOptions();
+
+  alert("사용자 지정 종목을 삭제했습니다.");
+});
+
+
+// 운동 부위 변경 이벤트
+$("planCategory").addEventListener(
+  "change",
+  updatePlanExerciseOptions
+);
+
+
+// 최초 실행
+updatePlanExerciseOptions();
 // 운동 계획 추가
 $("addPlanExercise").addEventListener("click",()=>{
 
@@ -688,16 +1701,7 @@ $("addSet").addEventListener("click",()=>{
   addSetRow();
   saveWorkoutDraft();
 });
-$("removeLastSet").addEventListener("click",()=>{
-  const box=$("setRows");
-  if(box.children.length<=1){
-    alert("최소 한 세트는 남겨야 합니다.");
-    return;
-  }
-  box.lastElementChild.remove();
-renumberSets();
-saveWorkoutDraft();
-});
+
 
 addSetRow();
 addSetRow();
@@ -782,44 +1786,112 @@ function volume(r){
 
 function renderRecords(){
   $("recordTitle").textContent="📋 "+selectedDate+" 운동 기록";
+
   const box=$("records");
   box.replaceChildren();
 
   const list=records.filter(r=>r.date===selectedDate);
 
   if(!list.length){
-    box.appendChild(node("p","muted","이 날짜에는 운동 기록이 없습니다."));
+    box.appendChild(
+      node("p","muted","이 날짜에는 운동 기록이 없습니다.")
+    );
     return;
   }
 
   list.forEach(r=>{
     const item=node("div","entry");
-    item.appendChild(node("strong","",r.exercise));
 
+    // 운동 이름과 펼치기 버튼
+    const header=document.createElement("div");
+    header.style.display="flex";
+    header.style.alignItems="center";
+    header.style.justifyContent="space-between";
+    header.style.gap="8px";
+
+    // 왼쪽 영역
+    const left=document.createElement("div");
+    left.style.display="flex";
+    left.style.alignItems="center";
+    left.style.gap="8px";
+    left.style.flex="1";
+    left.style.minWidth="0";
+
+    const title=node("strong","",r.exercise);
+
+    // 세부 기록 펼치기 버튼
+    const toggle=node("button","secondary small","＋");
+    toggle.type="button";
+    toggle.title="세부 운동 기록 보기";
+    toggle.style.width="34px";
+    toggle.style.minWidth="34px";
+    toggle.style.padding="0";
+    toggle.style.fontSize="18px";
+
+    // 오른쪽 삭제 버튼
+    const del=node("button","danger small","×");
+    del.type="button";
+    del.title="운동 기록 삭제";
+    del.style.width="38px";
+    del.style.minWidth="38px";
+    del.style.padding="0";
+    del.style.fontSize="20px";
+
+    // 세부 기록 영역
+    const details=document.createElement("div");
+    details.style.display="none";
+    details.style.paddingLeft="4px";
+
+    // 세트별 운동 기록
     r.sets.forEach((s,i)=>{
-      item.appendChild(node("p","",(i+1)+"세트: "+s.weight+"kg × "+s.reps+"회"));
+      details.appendChild(
+        node("p","",(i+1)+"세트: "+s.weight+"kg × "+s.reps+"회")
+      );
     });
 
-    const totalReps=r.sets.reduce((sum,s)=>sum+s.reps,0);
-    item.appendChild(node("p","muted",
-      r.sets.length+"세트 · 총 "+totalReps+"회 · 운동량 "+volume(r).toLocaleString("ko-KR")+"kg"
-    ));
+    const totalReps=r.sets.reduce(
+      (sum,s)=>sum+s.reps,0
+    );
 
-    if(r.note)item.appendChild(node("p","",r.note));
+    details.appendChild(
+      node("p","muted",
+        r.sets.length+"세트 · 총 "+totalReps+
+        "회 · 운동량 "+volume(r).toLocaleString("ko-KR")+"kg"
+      )
+    );
 
-    const actions=node("div","entry-actions");
-    const del=node("button","danger small","기록 삭제");
+    if(r.note){
+      details.appendChild(node("p","",r.note));
+    }
+
+    // 펼치기 / 접기
+    toggle.addEventListener("click",()=>{
+      const isOpen=details.style.display!=="none";
+
+      details.style.display=isOpen?"none":"block";
+      toggle.textContent=isOpen?"＋":"－";
+      toggle.title=isOpen
+        ?"세부 운동 기록 보기"
+        :"세부 운동 기록 접기";
+    });
+
+    // 기록 삭제
     del.addEventListener("click",()=>{
       if(!confirm("이 운동 기록을 삭제할까요?"))return;
+
       records=records.filter(x=>x.id!==r.id);
+
       if(persist())renderAll();
     });
 
-    actions.appendChild(del);
-    item.appendChild(actions);
+    left.append(title,toggle);
+    header.append(left,del);
+
+    item.append(header,details);
     box.appendChild(item);
   });
 }
+
 // 지난 운동 기록 찾아서 표시하기
 function renderPrevious(){
   const exercise = $("exercise").value.trim().toLowerCase();
